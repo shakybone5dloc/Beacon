@@ -4,7 +4,7 @@ using Beacon.Application.Abstractions;
 
 namespace Beacon.Infrastructure.Data;
 
-public class BeaconDbContext(DbContextOptions<BeaconDbContext> options) : BeaconDbContext(options), IBeaconDbContext
+public class BeaconDbContext(DbContextOptions<BeaconDbContext> options) : DbContext(options), IBeaconDbContext
 {
 
 }
