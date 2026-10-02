@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>fab27ba9-afb4-4ed9-9940-d110a98caf9a</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Beacon.Contracts\Beacon.Contracts.csproj" />
+	  <ProjectReference Include="..\Beacon.Application\Beacon.Application.csproj" />
+	  <ProjectReference Include="..\Beacon.Infrastructure\Beacon.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

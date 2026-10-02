@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="ci.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".env" />
+    <File Path="compose.yaml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Beacon.Api/Beacon.Api.csproj" />
+    <Project Path="src/Beacon.Application/Beacon.Application.csproj" />
+    <Project Path="src/Beacon.Contracts/Beacon.Contracts.csproj" />
+    <Project Path="src/Beacon.Domain/Beacon.Domain.csproj" />
+    <Project Path="src/Beacon.Infrastructure/Beacon.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Beacon.Tests/Beacon.Tests.csproj" />
+  </Folder>
+</Solution>
