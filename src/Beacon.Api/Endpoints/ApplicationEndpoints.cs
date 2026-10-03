@@ -36,7 +36,7 @@ public static class ApplicationEndpoints
         TypedResults.Ok(await service.ListAsync(ct));  
     
     private static async Task<Results<Ok<ApplicationResponse>, NotFound, ValidationProblem>> ChangeStatusAsync(
-        Guid id, ChangeStatuRequest request, ApplicationService service, CancellationToken ct)
+        Guid id, ChangeStatusRequest request, ApplicationService service, CancellationToken ct)
     {
         if (!Enum.TryParse<ApplicationStatus>(request.Status, ignoreCase: true, out var status)
             || !Enum.IsDefined(status))

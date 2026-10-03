@@ -49,6 +49,7 @@ public sealed class JobApplicationTests
     [InlineData(Offer, Interviewing)]
     [InlineData(Interviewing, Applied)]
     [InlineData(Rejected, Offer)]
+    [InlineData(Withdrawn, Saved)]
     public void Illegal_moves_throw(ApplicationStatus from, ApplicationStatus to)
     {
         var app = At(from);

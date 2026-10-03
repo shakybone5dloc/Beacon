@@ -63,6 +63,9 @@ public sealed class ApplicationStatusTests(BeaconApiFactory factory) : IClassFix
 
         var second = await PatchStatusAsync(created.Id, "Interviewing", created.Version, ct);
         Assert.Equal(HttpStatusCode.Conflict, second.StatusCode);
+        var body = await second.Content.ReadFromJsonAsync<ProblemDetails>(ct);
+        Assert.NotNull(body);
+        Assert.Contains("changed by someone else", body.Detail);
     }
 
     private async Task<ApplicationResponse> CreateAsync(CancellationToken ct)
@@ -78,6 +81,6 @@ public sealed class ApplicationStatusTests(BeaconApiFactory factory) : IClassFix
     private Task<HttpResponseMessage> PatchStatusAsync(Guid id, string status, uint version, CancellationToken ct) =>
         _client.PatchAsJsonAsync(
             $"/api/applications/{id}/status",
-            new ChangeStatuRequest { Status = status, Version = version },
+            new ChangeStatusRequest { Status = status, Version = version },
             ct);
 }

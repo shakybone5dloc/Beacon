@@ -4,7 +4,7 @@ using Microsoft.Extensions.Validation;
 namespace Beacon.Contracts.Applications;
 
 [ValidatableType]
-public sealed record ChangeStatuRequest
+public sealed record ChangeStatusRequest
 {
     [Required]
     public string Status { get; init; } = "";
