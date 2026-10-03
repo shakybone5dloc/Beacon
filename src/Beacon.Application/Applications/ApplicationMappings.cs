@@ -13,5 +13,6 @@ public static class ApplicationMappings
         a.Notes,
         a.Status.ToString(),
         a.CreatedAt,
-        a.UpdatedAt);
+        a.UpdatedAt,
+        a.Version);
 }

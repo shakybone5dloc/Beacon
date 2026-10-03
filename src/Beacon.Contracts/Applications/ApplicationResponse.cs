@@ -8,4 +8,5 @@ public sealed record ApplicationResponse(
     string? Notes,
     string Status,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    uint Version);

@@ -1,4 +1,5 @@
-﻿namespace Beacon.Domain.Applications;
+﻿using Beacon.Domain;
+namespace Beacon.Domain.Applications;
 
 public class JobApplication
 {
@@ -24,12 +25,22 @@ public class JobApplication
 
     }
 
-    public const int MaxNoteLength = 300;
+    public void ChangeStatus(ApplicationStatus newStatus, DateTimeOffset now)
+    {
+        if (newStatus == Status) throw new DomainException($"Application is already {Status}.");
+        if (!ApplicationStatusTransitions.CanMove(Status, newStatus))
+            throw new DomainException($"Cannot move an application from {Status} to {newStatus}.");
+
+        Status = newStatus;
+        UpdatedAt = now;
+    }
+
     public Guid Id { get; private set; }
     public string Company { get; private set; } = null!;
     public string Role { get; private set; } = null!;
     public string? JobUrl { get; private set; }
     public string? Notes { get; private set; }
+    public uint Version { get; private set; }
     public ApplicationStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }

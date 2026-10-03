@@ -40,4 +40,18 @@ public sealed class ApplicationService(IBeaconDbContext db, TimeProvider time)
 
         return applications.Select(a => a.ToResponse()).ToList();
     }
+
+    public async Task<ApplicationResponse?> ChangeStatusAsync(
+        Guid id, ApplicationStatus newStatus, uint expectedVersion, CancellationToken ct)
+    {
+        var application = await db.JobApplications.FirstOrDefaultAsync(a => a.Id == id, ct);
+        if (application is null) return null;
+
+        db.Entry(application).Property(a => a.Version).OriginalValue = expectedVersion;
+
+        application.ChangeStatus(newStatus, time.GetUtcNow());
+
+        await db.SaveChangesAsync(ct);
+        return application.ToResponse();
+    }
 }

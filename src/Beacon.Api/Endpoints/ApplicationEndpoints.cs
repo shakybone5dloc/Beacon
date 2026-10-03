@@ -1,5 +1,6 @@
 using Beacon.Application.Applications;
 using Beacon.Contracts.Applications;
+using Beacon.Domain.Applications;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Beacon.Api.Endpoints;
@@ -13,6 +14,7 @@ public static class ApplicationEndpoints
         group.MapPost("/", CreateAsync);
         group.MapGet("/{id:guid}", GetByIdAsync);
         group.MapGet("/", ListAsync);
+        group.MapPatch("/{id:guid}/status", ChangeStatusAsync);
 
         return app;
     }
@@ -31,5 +33,22 @@ public static class ApplicationEndpoints
 
     private static async Task<Ok<IReadOnlyList<ApplicationResponse>>> ListAsync(
         ApplicationService service, CancellationToken ct) =>
-        TypedResults.Ok(await service.ListAsync(ct));    
+        TypedResults.Ok(await service.ListAsync(ct));  
+    
+    private static async Task<Results<Ok<ApplicationResponse>, NotFound, ValidationProblem>> ChangeStatusAsync(
+        Guid id, ChangeStatuRequest request, ApplicationService service, CancellationToken ct)
+    {
+        if (!Enum.TryParse<ApplicationStatus>(request.Status, ignoreCase: true, out var status)
+            || !Enum.IsDefined(status))
+        {
+            return TypedResults.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["status"] = [$"'{request.Status}' is not a valid status."]
+            });
+        }
+
+        return await service.ChangeStatusAsync(id, status, request.Version, ct) is { } result
+            ? TypedResults.Ok(result) : TypedResults.NotFound();
+
+    }
 }

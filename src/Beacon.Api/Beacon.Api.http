@@ -30,3 +30,21 @@ Content-Type: application/json
   "role": "",
   "jobUrl": "not-a-url"
 }
+
+### Move the created app to Applied (copy the version from the Create response)
+PATCH {{host}}/api/applications/{{create.response.body.$.id}}/status
+Content-Type: application/json
+
+{ "status": "Applied", "version": {{create.response.body.$.version}} }
+
+### Illegal move -> 409 (Saved/Applied can't jump to Offer)
+PATCH {{host}}/api/applications/{{create.response.body.$.id}}/status
+Content-Type: application/json
+
+{ "status": "Offer", "version": {{create.response.body.$.version}} }
+
+### Bad status string -> 400
+PATCH {{host}}/api/applications/{{create.response.body.$.id}}/status
+Content-Type: application/json
+
+{ "status": "Hired", "version": 0 }

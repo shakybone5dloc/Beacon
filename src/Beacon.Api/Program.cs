@@ -3,11 +3,13 @@ using Beacon.Infrastructure;
 using Beacon.Api.Endpoints;
 using Beacon.Application;
 using Beacon.Contracts;
+using Beacon.Api.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ConflictExceptionHandler>();
 builder.Services.AddContracts();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
