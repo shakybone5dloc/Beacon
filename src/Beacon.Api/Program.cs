@@ -1,13 +1,20 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Beacon.Infrastructure;
+using Beacon.Api.Endpoints;
+using Beacon.Application;
+using Beacon.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
+builder.Services.AddContracts();
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
@@ -18,6 +25,8 @@ app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = c => c.Tags.Contains("ready") });
+
+app.MapApplicationEndpoints();
 
 app.Run();
 

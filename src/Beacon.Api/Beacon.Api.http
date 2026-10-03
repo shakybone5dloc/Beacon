@@ -1,6 +1,32 @@
-@Beacon.Api_HostAddress = http://localhost:5273
+@host = http://localhost:5273
 
-GET {{Beacon.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Create
+# @name create
+POST {{host}}/api/applications
+Content-Type: application/json
 
-###
+{
+  "company": "Contoso",
+  "role": "Senior .NET Engineer",
+  "jobUrl": "https://contoso.example/jobs/123",
+  "notes": "Referred by a friend"
+}
+
+### Get the one we just created
+GET {{host}}/api/applications/{{create.response.body.$.id}}
+
+### List (newest first)
+GET {{host}}/api/applications
+
+### Unknown id -> 404
+GET {{host}}/api/applications/00000000-0000-0000-0000-000000000000
+
+### Invalid -> 400
+POST {{host}}/api/applications
+Content-Type: application/json
+
+{
+  "company": "    ",
+  "role": "",
+  "jobUrl": "not-a-url"
+}
