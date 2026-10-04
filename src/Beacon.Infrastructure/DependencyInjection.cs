@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Beacon.Application.Abstractions;
+using Beacon.Infrastructure.Documents;
 
 namespace Beacon.Infrastructure;
 
@@ -19,6 +20,10 @@ public static class DependencyInjection
 
         services.AddHealthChecks()
             .AddDbContextCheck<BeaconDbContext>("database", tags: ["ready"]);
+
+        services.AddSingleton<ChannelDocumentQueue>();
+        services.AddSingleton<IDocumentQueue>(sp => sp.GetRequiredService<ChannelDocumentQueue>());
+        services.AddHostedService<DocumentProcessingWorker>();
 
         return services;
     }

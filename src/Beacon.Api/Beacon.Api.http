@@ -48,3 +48,42 @@ PATCH {{host}}/api/applications/{{create.response.body.$.id}}/status
 Content-Type: application/json
 
 { "status": "Hired", "version": 0 }
+
+### Upload a resume
+# @name upload
+POST {{host}}/api/documents
+Content-Type: multipart/form-data; boundary=BeaconBoundary
+
+--BeaconBoundary
+Content-Disposition: form-data; name="file"; filename="resume.md"
+Content-Type: text/markdown
+
+# AJ Keiper
+Senior .NET engineer. C#, ASP.NET Core, EF Core, PostgreSQL, Azure, Docker.
+Led a team building property management software.
+--BeaconBoundary
+Content-Disposition: form-data; name="kind"
+
+Resume
+--BeaconBoundary--
+
+### Check its status (run a second or two after upload)
+GET {{host}}/api/documents/{{upload.response.body.$.id}}
+
+### Wrong file type -> 400
+POST {{host}}/api/documents
+Content-Type: multipart/form-data; boundary=BeaconBoundary
+
+--BeaconBoundary
+Content-Disposition: form-data; name="file"; filename="resume.pdf"
+Content-Type: application/pdf
+
+not really a pdf
+--BeaconBoundary
+Content-Disposition: form-data; name="kind"
+
+Resume
+--BeaconBoundary--
+
+### Documents for an application (uses the app from your Create request earlier)
+GET {{host}}/api/applications/{{create.response.body.$.id}}/documents
