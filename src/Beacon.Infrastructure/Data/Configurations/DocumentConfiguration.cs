@@ -21,7 +21,7 @@ internal sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.HasOne<JobApplication>()
             .WithMany()
             .HasForeignKey(d => d.JobApplicationId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(d => d.Status);
         builder.HasIndex(d => d.JobApplicationId);

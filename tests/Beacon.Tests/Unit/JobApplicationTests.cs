@@ -58,7 +58,7 @@ public sealed class JobApplicationTests
     }
 
     [Fact]
-    public async Task Moving_to_the_same_status_throws()
+    public void Moving_to_the_same_status_throws()
     {
         var app = At(Applied);
         Assert.Throws<DomainException>(() => app.ChangeStatus(Applied, Now));

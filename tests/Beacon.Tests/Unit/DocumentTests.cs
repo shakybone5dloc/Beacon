@@ -40,6 +40,7 @@ public sealed class DocumentTests
         doc.StartProcessing(Now);
         doc.MarkFailed(error, Now);
 
+        Assert.Equal(DocumentStatus.Failed, doc.Status);
         Assert.Equal(error, doc.Error);
     }
 

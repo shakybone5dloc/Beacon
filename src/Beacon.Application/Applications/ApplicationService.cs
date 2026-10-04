@@ -15,7 +15,7 @@ public sealed class ApplicationService(IBeaconDbContext db, TimeProvider time)
             request.JobUrl,
             request.Notes,
             time.GetUtcNow());
-        await db.JobApplications.AddAsync(application, ct);
+        db.JobApplications.Add(application);
         await db.SaveChangesAsync(ct);
 
         return application.ToResponse();
