@@ -87,3 +87,6 @@ Resume
 
 ### Documents for an application (uses the app from your Create request earlier)
 GET {{host}}/api/applications/{{create.response.body.$.id}}/documents
+
+### Embedding smoke test (dev only, needs Ollama running)
+GET {{host}}/dev/embed?text=Senior%20.NET%20engineer%20with%20Kubernetes%20experience

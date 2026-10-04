@@ -4,6 +4,7 @@ using Beacon.Api.Endpoints;
 using Beacon.Application;
 using Beacon.Contracts;
 using Beacon.Api.Errors;
+using Microsoft.Extensions.AI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,19 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapGet("/dev/embed", async (
+        string text,
+        IEmbeddingGenerator<string, Embedding<float>> generator,
+        CancellationToken ct) =>
+    {
+        ReadOnlyMemory<float> vector = await generator.GenerateVectorAsync(text, cancellationToken: ct);
+
+        return TypedResults.Ok(new
+        {
+            dimensions = vector.Length,
+            first5 = vector.Span[..5].ToArray()
+        });
+    });
 }
 
 app.UseHttpsRedirection();
