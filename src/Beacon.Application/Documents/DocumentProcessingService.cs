@@ -55,7 +55,7 @@ public sealed class DocumentProcessingService(
         
         document.MarkReady(chunks, time.GetUtcNow());
 
-        vectors.SetEmbeddings(document.Chunks, embeddings.Select(embedder => embedder.Vector).ToList());
+        vectors.SetEmbeddings(document.Chunks, embeddings.Select(e => e.Vector).ToList());
 
         await db.SaveChangesAsync(ct);
 

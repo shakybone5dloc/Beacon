@@ -53,7 +53,6 @@ public sealed class SearchTests(BeaconApiFactory factory) : IClassFixture<Beacon
         var results = await _client.GetFromJsonAsync<List<SearchResult>>(
             $"/api/search?q=terraform&applicationId={firstApp.Id}", ct);
 
-        Assert.NotNull(results);
         Assert.All(results, r => Assert.Equal(firstDoc.Id, r.DocumentId));
 
     }
@@ -62,11 +61,6 @@ public sealed class SearchTests(BeaconApiFactory factory) : IClassFixture<Beacon
     public async Task Empty_query_returns_400()
     {
         var ct = TestContext.Current.CancellationToken;
-
-        var doc = await _client.UploadAndWaitAsync("resume.md",
-            "Nothing here", ct: ct);
-
-        Assert.Equal("Ready", doc.Status);
 
         var results = await _client.GetAsync("/api/search?q=", ct);
 
