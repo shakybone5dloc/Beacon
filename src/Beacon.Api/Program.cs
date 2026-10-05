@@ -44,6 +44,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = c => c
 
 app.MapApplicationEndpoints();
 app.MapDocumentEndpoints();
+app.MapSearchEndpoints();
 
 app.Run();
 

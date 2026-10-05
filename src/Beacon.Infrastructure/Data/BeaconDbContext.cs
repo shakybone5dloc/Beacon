@@ -13,6 +13,7 @@ public class BeaconDbContext(DbContextOptions<BeaconDbContext> options) : DbCont
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresExtension("vector");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BeaconDbContext).Assembly);
     }
 }

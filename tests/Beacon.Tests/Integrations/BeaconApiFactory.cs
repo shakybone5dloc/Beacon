@@ -1,8 +1,10 @@
 ﻿using Beacon.Infrastructure.Data;
+using Beacon.Tests.Fakes;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Time.Testing;
@@ -29,7 +31,10 @@ public sealed class BeaconApiFactory : WebApplicationFactory<Program>, IAsyncLif
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<TimeProvider>();
-            services.AddSingleton<TimeProvider>(Clock); 
+            services.AddSingleton<TimeProvider>(Clock);
+
+            services.RemoveAll<IEmbeddingGenerator<string, Embedding<float>>>();
+            services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>, FakeEmbeddingGenerator>();
         });
     }
 

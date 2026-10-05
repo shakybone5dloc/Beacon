@@ -1,5 +1,6 @@
 ﻿using Beacon.Application.Applications;
 using Beacon.Application.Documents;
+using Beacon.Application.Search;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.Application;
@@ -12,6 +13,7 @@ public static class DependencyInjection
         services.AddScoped<ApplicationService>();
         services.AddScoped<DocumentProcessingService>();
         services.AddScoped<DocumentService>();
+        services.AddScoped<SearchService>();
         return services;
     }
 }

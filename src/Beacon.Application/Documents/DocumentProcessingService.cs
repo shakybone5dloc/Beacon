@@ -1,12 +1,17 @@
 ﻿using Beacon.Application.Abstractions;
 using Beacon.Domain.Documents;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 
 namespace Beacon.Application.Documents;
 
 public sealed class DocumentProcessingService(
-    IBeaconDbContext db, TimeProvider time, ILogger<DocumentProcessingService> logger)
+    IBeaconDbContext db, 
+    IEmbeddingGenerator<string, Embedding<float>> embedder,
+    IVectorStore vectors,
+    TimeProvider time, 
+    ILogger<DocumentProcessingService> logger)
 {
     public async Task ProcessAsync(Guid documentId, CancellationToken ct)
     {
@@ -29,9 +34,28 @@ public sealed class DocumentProcessingService(
         var chunks = TextChunker.Chunk(document.Content);
 
         if (chunks.Count == 0)
+        {
             document.MarkFailed("Document contains no text", time.GetUtcNow());
-        else
-            document.MarkReady(chunks, time.GetUtcNow());
+            await db.SaveChangesAsync(ct);
+            return;
+        }
+
+        GeneratedEmbeddings<Embedding<float>> embeddings;
+        try
+        {
+            embeddings = await embedder.GenerateAsync(chunks, cancellationToken: ct);
+        }
+        catch (Exception ex) when (!ct.IsCancellationRequested)
+        {
+            logger.LogWarning(ex, "Embedding failed for document {DocumentId}", document.Id);
+            document.MarkFailed($"Embedding failed: {ex.Message}", time.GetUtcNow());
+            await db.SaveChangesAsync(ct);
+            return;
+        }
+        
+        document.MarkReady(chunks, time.GetUtcNow());
+
+        vectors.SetEmbeddings(document.Chunks, embeddings.Select(embedder => embedder.Vector).ToList());
 
         await db.SaveChangesAsync(ct);
 
