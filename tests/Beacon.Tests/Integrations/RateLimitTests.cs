@@ -14,6 +14,7 @@ public sealed class LowRateLimitApiFactory : BeaconApiFactory
     {
         base.ConfigureWebHost(builder);
         builder.UseSetting("RateLimiting:Ask:PermitLimit", Limit.ToString());
+        builder.UseSetting("RateLimiting:Ask:WindowSeconds", "3600");
     }
 }
 
@@ -27,7 +28,7 @@ public sealed class RateLimitTests(LowRateLimitApiFactory factory) : IClassFixtu
         var ct = TestContext.Current.CancellationToken;
         for (var i = 0; i < LowRateLimitApiFactory.Limit; i++)
         {
-            var response = await _client.PostAsJsonAsync("/api/ask", new AskRequest { Question = $"questiong {i + 1}" }, ct);
+            var response = await _client.PostAsJsonAsync("/api/ask", new AskRequest { Question = $"question {i + 1}" }, ct);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 

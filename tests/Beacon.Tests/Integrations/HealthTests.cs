@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using System.Net.Http.Json;
 using System.Text.Json;
-using Beacon.Infrastructure.Data;
 
 namespace Beacon.Tests.Integrations;
 
@@ -13,8 +11,7 @@ public sealed class HealthTests(BeaconApiFactory factory) : IClassFixture<Beacon
     public async Task HealthCheck_Returns200()
     {
         var ct = TestContext.Current.CancellationToken;
-        var client = factory.CreateClient();
-        var response = await client.GetAsync("/health/live", ct);
+        var response = await _client.GetAsync("/health/live", ct);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
