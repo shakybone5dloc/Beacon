@@ -40,6 +40,12 @@ public static class DependencyInjection
             $"Ai:EmbeddingDimensions must be {DocumentChunkConfiguration.EmbeddingDimensions} to match the database column.")
             .ValidateOnStart();
 
+        services.AddChatClient(sp =>
+        {
+            var ai = sp.GetRequiredService<IOptions<AiOptions>>().Value;
+            return new OllamaApiClient(new Uri(ai.Endpoint), ai.ChatModel);
+        });
+
         services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>>(sp =>
         {
             var ai = sp.GetRequiredService<IOptions<AiOptions>>().Value;

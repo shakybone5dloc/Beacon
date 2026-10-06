@@ -21,6 +21,7 @@ public sealed class BeaconApiFactory : WebApplicationFactory<Program>, IAsyncLif
         .Build();
 
     public FakeTimeProvider Clock { get; } = new(StartTime);
+    public FakeChatClient Chat { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -35,6 +36,9 @@ public sealed class BeaconApiFactory : WebApplicationFactory<Program>, IAsyncLif
 
             services.RemoveAll<IEmbeddingGenerator<string, Embedding<float>>>();
             services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>, FakeEmbeddingGenerator>();
+
+            services.RemoveAll<IChatClient>();
+            services.AddSingleton<IChatClient>(Chat);
         });
     }
 

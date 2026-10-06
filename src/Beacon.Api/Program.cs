@@ -35,6 +35,16 @@ if (app.Environment.IsDevelopment())
             first5 = vector.Span[..5].ToArray()
         });
     });
+    app.MapGet("/dev/chat", async (string prompt, IChatClient chat, HttpResponse response, CancellationToken ct) =>
+    {
+        response.ContentType = "text/plain; charset=utf-8";
+
+        await foreach (var update in chat.GetStreamingResponseAsync(prompt, cancellationToken: ct))
+        {
+            await response.WriteAsync(update.Text, ct);
+            await response.Body.FlushAsync(ct);
+        }
+    });
 }
 
 app.UseHttpsRedirection();
@@ -45,6 +55,7 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = c => c
 app.MapApplicationEndpoints();
 app.MapDocumentEndpoints();
 app.MapSearchEndpoints();
+app.MapAskEndpoints();
 
 app.Run();
 

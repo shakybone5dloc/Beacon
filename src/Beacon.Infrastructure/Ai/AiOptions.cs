@@ -9,4 +9,5 @@ public sealed class AiOptions
     [Required, Url] public string Endpoint { get; init; } = "";
     [Required] public string EmbeddingModel { get; init; } = "";
     [Range(1, 4096)] public int EmbeddingDimensions { get; init; }
+    [Required] public string ChatModel { get; init; } = "";
 }

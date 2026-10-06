@@ -1,4 +1,5 @@
 ﻿using Beacon.Application.Applications;
+using Beacon.Application.Ask;
 using Beacon.Application.Documents;
 using Beacon.Application.Search;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ public static class DependencyInjection
         services.AddScoped<DocumentProcessingService>();
         services.AddScoped<DocumentService>();
         services.AddScoped<SearchService>();
+        services.AddScoped<AskService>();
         return services;
     }
 }
