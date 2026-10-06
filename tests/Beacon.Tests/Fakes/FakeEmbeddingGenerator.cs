@@ -8,6 +8,7 @@ namespace Beacon.Tests.Fakes;
 public sealed class FakeEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>>
 {
     public const string FailMarker = "FAIL_EMBEDDING";
+    public const string UnavailableMarker = "AI_UNAVAILABLE";
     private const int Dimensions = 768;
     private static readonly char[] Seperators = [' ', '\n', '\r', '\t', '.', ',', ';', ':', '!', '?', '(', ')'];
 
@@ -17,6 +18,8 @@ public sealed class FakeEmbeddingGenerator : IEmbeddingGenerator<string, Embeddi
         CancellationToken cancellationToken = default)
     {
         var texts = values.ToList();
+        if (texts.Any(t => t.Contains(UnavailableMarker)))
+            throw new HttpRequestException("Connection refused (fake outage)");
 
         if (texts.Any(t => t.Contains(FailMarker)))
             throw new InvalidOperationException("Fake embedding failure");

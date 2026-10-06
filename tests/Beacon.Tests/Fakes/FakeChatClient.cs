@@ -6,6 +6,7 @@ namespace Beacon.Tests.Fakes;
 public sealed class FakeChatClient : IChatClient
 {
     public const string CannedAnswer = "You have Kubernetes experience [1].";
+    public const string UnavailableMarker = "CHAT_DOWN";
 
     private int _calls;
     public int Calls => Volatile.Read(ref _calls);
@@ -30,6 +31,8 @@ public sealed class FakeChatClient : IChatClient
             await Task.Yield();
             var piece = i == 0 ? words[i] : " " + words[i];
             yield return new ChatResponseUpdate(ChatRole.Assistant, piece);
+            if (i == 0 && LastMessages!.Any(m => m.Text.Contains(UnavailableMarker)))
+                throw new HttpRequestException("Connection reset (fake mid-stream outage)");
         }
     }
 

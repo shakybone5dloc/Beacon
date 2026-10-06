@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Beacon.Contracts.Search;
 using Beacon.Tests.Fakes;
 
@@ -79,5 +80,34 @@ public sealed class SearchTests(BeaconApiFactory factory) : IClassFixture<Beacon
 
         Assert.Equal("Failed", doc.Status);
         Assert.Equal("Embedding failed: Fake embedding failure", doc.Error);
+    }
+
+    [Fact]
+    public async Task Ai_outage_during_search_returns_503_with_retry_after()
+    {
+        var ct = TestContext.Current.CancellationToken;
+
+        var response = await _client.GetAsync($"/api/search?q={FakeEmbeddingGenerator.UnavailableMarker}", ct);
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+
+        Assert.NotNull(response.Headers.RetryAfter);
+
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(ct);
+        Assert.NotNull(problem);
+        Assert.Equal("Ai service unavailable", problem.Title);
+
+        
+    }
+
+    [Fact]
+    public async Task Unexpected_error_during_search_is_still_a_500()
+    {
+        var ct = TestContext.Current.CancellationToken;
+
+        var response = await _client.GetAsync($"/api/search?q={FakeEmbeddingGenerator.FailMarker}", ct);
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        
     }
 }

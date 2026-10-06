@@ -83,6 +83,37 @@ public sealed class AskTests(BeaconApiFactory factory) : IClassFixture<BeaconApi
         Assert.DoesNotContain("Terraform modules provision Azure networking", messages[0].Text);
     }
 
+    [Fact]
+    public async Task Retrieval_outage_ends_the_stream_with_an_error_event()
+    {
+        var ct = TestContext.Current.CancellationToken;
+        var callsBefore = factory.Chat.Calls;
+
+        var events = await AskAsync($"tell me about {FakeEmbeddingGenerator.UnavailableMarker}", ct);
+
+        Assert.Equal(2, events.Count);
+        Assert.Equal(AskService.AiUnavailableMessage, Parse<ErrorEvent>(events[0]).Message);
+        Assert.False(Parse<DoneEvent>(events[^1]).Grounded);
+        Assert.Equal(callsBefore, factory.Chat.Calls);
+    }
+
+    [Fact]
+    public async Task Mid_stream_outage_keeps_partial_answer_and_ends_with_error()
+    {
+        var ct = TestContext.Current.CancellationToken;
+
+        await _client.UploadAndWaitAsync("ansible.md",
+            $"Ansible playbooks automate service setup {FakeChatClient.UnavailableMarker}", ct: ct);
+
+        var events = await AskAsync("ansible playbooks automate", ct);
+
+        Assert.Equal("sources", events[0].EventType);
+        Assert.Equal("token", events[1].EventType);
+        Assert.Equal("error", events[^2].EventType);
+        Assert.Equal("done", events[^1].EventType);
+        Assert.False(Parse<DoneEvent>(events[^1]).Grounded);
+    }
+
     private async Task<List<SseItem<string>>> AskAsync(string question, CancellationToken ct)
     {
         var response = await _client.PostAsJsonAsync("/api/ask", new AskRequest { Question = question }, ct);

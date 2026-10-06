@@ -12,7 +12,7 @@ using Testcontainers.PostgreSql;
 
 namespace Beacon.Tests.Integrations;
 
-public sealed class BeaconApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class BeaconApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public static readonly DateTimeOffset StartTime = new(2026, 11, 1, 12, 0, 0, TimeSpan.Zero);
 
@@ -28,6 +28,8 @@ public sealed class BeaconApiFactory : WebApplicationFactory<Program>, IAsyncLif
         builder.UseEnvironment("Testing");
 
         builder.UseSetting("ConnectionStrings:Beacon", _db.GetConnectionString());
+        builder.UseSetting("RateLimiting:Ask:PermitLimit", "1000");
+        builder.UseSetting("Ai:Endpoint", "http://127.0.0.1:9");
 
         builder.ConfigureTestServices(services =>
         {
