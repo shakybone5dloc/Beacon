@@ -80,7 +80,7 @@ public sealed class AskTests(BeaconApiFactory factory) : IClassFixture<BeaconApi
 
         Assert.Equal(ChatRole.System, messages[0].Role);
         Assert.Contains("Terraform modules provision Azure networking", messages[1].Text);
-        Assert.DoesNotContain("terraform modules azure", messages[0].Text);
+        Assert.DoesNotContain("Terraform modules provision Azure networking", messages[0].Text);
     }
 
     private async Task<List<SseItem<string>>> AskAsync(string question, CancellationToken ct)

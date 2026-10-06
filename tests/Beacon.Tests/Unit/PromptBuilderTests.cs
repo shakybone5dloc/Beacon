@@ -42,7 +42,7 @@ public sealed class PromptBuilderTests
         var messages = PromptBuilder.Build(question, [Source(1, "passage")]);
         var user = messages[1].Text;
 
-        Assert.Contains(question, user);
+        Assert.Contains($"Question: {question}", user);
     }
 
     [Fact]

@@ -53,6 +53,8 @@ public sealed class SearchTests(BeaconApiFactory factory) : IClassFixture<Beacon
         var results = await _client.GetFromJsonAsync<List<SearchResult>>(
             $"/api/search?q=terraform&applicationId={firstApp.Id}", ct);
 
+        Assert.NotNull(results);
+        Assert.NotEmpty(results);
         Assert.All(results, r => Assert.Equal(firstDoc.Id, r.DocumentId));
 
     }

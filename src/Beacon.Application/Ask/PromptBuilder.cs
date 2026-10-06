@@ -28,7 +28,7 @@ public static class PromptBuilder
 
         context.AppendLine("</sources>");
         context.AppendLine();
-        context.AppendLine($"Questing: {question}");
+        context.AppendLine($"Question: {question}");
 
         return
         [
