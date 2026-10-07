@@ -1,0 +1,85 @@
+﻿@page "/applications/new"
+@inject BeaconApiClient Api
+@inject NavigationManager Nav
+
+<PageTitle>Beacon · New application</PageTitle>
+
+<h1>New application</h1>
+
+<EditForm EditContext="_editContext" FormName="new-application" OnSubmit="SubmitAsync" Enhance class="form">
+    <ValidationSummary />
+
+    <label>
+        Company
+        <InputText @bind-Value="Form.Company" />
+    </label>
+    <ValidationMessage For="() => Form.Company" />
+
+    <label>
+        Role
+        <InputText @bind-Value="Form.Role" />
+    </label>
+    <ValidationMessage For="() => Form.Role" />
+
+    <label>
+        Job Posting Url
+        <InputText @bind-Value="Form.JobUrl" />
+    </label>
+    <ValidationMessage For="() => Form.JobUrl" />
+
+    <label>
+        Notes
+        <InputTextArea @bind-Value="Form.Notes" />
+    </label>
+    <ValidationMessage For="() => Form.Notes" />
+
+    <div class="buttons">
+        <button type="submit">Create</button>
+        <a href="/">Cancel</a>
+    </div>
+</EditForm>
+
+@code {
+    // Filled from the posted form data on submit; a fresh empty form on first load
+    [SupplyParameterFromForm]
+    private NewApplicationForm Form { get; set; } = new();
+
+    private EditContext _editContext = null!;
+    private ValidationMessageStore _messages = null!;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(Form);
+        _messages = new ValidationMessageStore(_editContext);
+    }
+
+    private async Task SubmitAsync()
+    {
+        _messages.Clear();
+
+        var result = await Api.CreateApplicationAsync(new CreateApplicationRequest
+        {
+            Company = Form.Company ?? "",
+            Role = Form.Role ?? "",
+            JobUrl = string.IsNullOrWhiteSpace(Form.JobUrl) ? null : Form.JobUrl,
+            Notes = string.IsNullOrWhiteSpace(Form.Notes) ? null : Form.Notes
+        });
+
+        if (result.Created is not null)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
+        // Put each API error next to its field
+        foreach (var (field, errors) in result.Errors!)
+        {
+            _messages.Add(_editContext.Field(ToPropertyName(field)), errors);
+        }
+        _editContext.NotifyValidationStateChanged();   // tell the form "new messages, re-render them"
+    }
+
+    // The API may send "company"; our property is "Company". Match them up.
+    private static string ToPropertyName(string field) =>
+        string.IsNullOrEmpty(field) ? field : char.ToUpperInvariant(field[0]) + field[1..];
+}

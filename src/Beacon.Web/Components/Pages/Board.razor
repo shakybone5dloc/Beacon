@@ -5,6 +5,7 @@
 <PageTitle>Beacon · Board</PageTitle>
 
 <h1>Applications</h1>
+<p><a class="new" href="/applications/new">+ New Application</a></p>
 
 @if (_applications is null)
 {
@@ -12,6 +13,10 @@
 }
 else
 {
+    @if (_message is not null)
+    {
+        <p class="notice">@_message</p>
+    }
     <div class="board">
         @foreach (var status in Columns)
         {
@@ -24,6 +29,15 @@ else
                     <article class="card">
                         <strong>@application.Company</strong>
                         <span>@application.Role</span>
+                        @if (application.AllowedTransitions.Count > 0)
+                        {
+                            <div class="actions">
+                                @foreach (var target in application.AllowedTransitions)
+                                {
+                                    <button disabled="@_busy" @onclick="() => MoveAsync(application, target)">@target</button>
+                                }
+                            </div>
+                        }
                     </article>
                 }
             </section>
@@ -31,16 +45,48 @@ else
     </div>
 }
 
-
 @code {
     private static readonly string[] Columns = ["Saved", "Applied", "Interviewing", "Offer", "Rejected", "Withdrawn"];
-    private IReadOnlyList<ApplicationResponse>? _applications;
 
-    protected override async Task OnInitializedAsync()
-    {
-        _applications = await Api.GetApplicationsAsync();
-    }
+    private List<ApplicationResponse>? _applications;
+    private bool _busy;
+    private string? _message;
 
-    private IEnumerable<ApplicationResponse> ForStatus(string status) => 
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync() =>
+        _applications = (await Api.GetApplicationsAsync()).ToList();
+
+    private IEnumerable<ApplicationResponse> ForStatus(string status) =>
         _applications!.Where(a => a.Status == status);
+
+    private async Task MoveAsync(ApplicationResponse application, string target)
+    {
+        _busy = true;
+        _message = null;
+        try
+        {
+            var result = await Api.ChangeStatusAsync(application.Id, target, application.Version);
+
+            switch (result.Outcome)
+            {
+                case MoveOutcome.Moved:
+                    var index = _applications.FindIndex(a => a.Id == application.Id);
+                    _applications[index] = result.Application!;
+                    break;
+                case MoveOutcome.Conflict:
+                    _message = "This application was changed somewhere else. The board has been refreshed.";
+                    await LoadAsync();
+                    break;
+                case MoveOutcome.NotFound:
+                    _message = result.Message;
+                    await LoadAsync();
+                    break;
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
 }

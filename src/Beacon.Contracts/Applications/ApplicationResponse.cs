@@ -9,4 +9,5 @@ public sealed record ApplicationResponse(
     string Status,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
-    uint Version);
+    uint Version,
+    IReadOnlyList<string> AllowedTransitions);

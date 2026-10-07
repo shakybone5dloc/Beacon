@@ -14,4 +14,9 @@ public static class ApplicationStatusTransitions
 
     public static bool CanMove(ApplicationStatus from, ApplicationStatus to) =>
         Allowed.TryGetValue(from, out var targets) && targets.Contains(to);
+
+    public static IReadOnlyList<ApplicationStatus> AllowFrom(ApplicationStatus from)
+    {
+        return Allowed.TryGetValue(from, out var targets) ? targets : [];
+    }
 }

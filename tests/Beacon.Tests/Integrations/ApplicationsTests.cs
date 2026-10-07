@@ -25,7 +25,7 @@ public sealed class ApplicationTests(BeaconApiFactory factory) : IClassFixture<B
         Assert.Equal($"/api/applications/{created.Id}", createResponse.Headers.Location?.ToString());
 
         var fetched = await _client.GetFromJsonAsync<ApplicationResponse>(createResponse.Headers.Location, ct);
-        Assert.Equal(created, fetched);
+        Assert.Equivalent(created, fetched);
     }
 
     [Fact]

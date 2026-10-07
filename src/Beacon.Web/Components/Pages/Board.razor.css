@@ -34,3 +34,31 @@
     flex-direction: column;
     gap: 0.2rem;
 }
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+}
+
+.actions button {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+.actions button:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+.notice {
+    background: #fff4e5;
+    border: 1px solid #f5c26b;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+}

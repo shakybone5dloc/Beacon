@@ -14,5 +14,6 @@ public static class ApplicationMappings
         a.Status.ToString(),
         a.CreatedAt,
         a.UpdatedAt,
-        a.Version);
+        a.Version,
+        ApplicationStatusTransitions.AllowFrom(a.Status).Select(s => s.ToString()).ToList());
 }

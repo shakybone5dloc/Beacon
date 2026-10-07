@@ -75,4 +75,11 @@ public sealed class JobApplicationTests
         Assert.Equal(later, app.UpdatedAt);
         Assert.Equal(Now, app.CreatedAt);
     }
+
+    [Fact]
+    public void AllowedFrom_lists_moves_and_final_states_have_none()
+    {
+        Assert.Equal([Applied, Withdrawn], ApplicationStatusTransitions.AllowFrom(Saved));
+        Assert.Empty(ApplicationStatusTransitions.AllowFrom(Rejected));
+    }
 }
