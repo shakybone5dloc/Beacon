@@ -1,0 +1,46 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject BeaconApiClient Api
+
+<PageTitle>Beacon · Board</PageTitle>
+
+<h1>Applications</h1>
+
+@if (_applications is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="board">
+        @foreach (var status in Columns)
+        {
+            var cards = ForStatus(status).ToList();
+
+            <section class="column">
+                <h2>@status <span class="count">@cards.Count</span></h2>
+                @foreach (var application in cards)
+                {
+                    <article class="card">
+                        <strong>@application.Company</strong>
+                        <span>@application.Role</span>
+                    </article>
+                }
+            </section>
+        }
+    </div>
+}
+
+
+@code {
+    private static readonly string[] Columns = ["Saved", "Applied", "Interviewing", "Offer", "Rejected", "Withdrawn"];
+    private IReadOnlyList<ApplicationResponse>? _applications;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _applications = await Api.GetApplicationsAsync();
+    }
+
+    private IEnumerable<ApplicationResponse> ForStatus(string status) => 
+        _applications!.Where(a => a.Status == status);
+}

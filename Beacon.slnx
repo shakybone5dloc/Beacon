@@ -13,6 +13,7 @@
     <Project Path="src/Beacon.Contracts/Beacon.Contracts.csproj" />
     <Project Path="src/Beacon.Domain/Beacon.Domain.csproj" />
     <Project Path="src/Beacon.Infrastructure/Beacon.Infrastructure.csproj" />
+    <Project Path="src/Beacon.Web/Beacon.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Beacon.Tests/Beacon.Tests.csproj" />
