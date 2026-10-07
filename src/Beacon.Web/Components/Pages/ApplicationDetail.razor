@@ -1,0 +1,165 @@
+﻿@page "/applications/{Id:guid}"
+@rendermode InteractiveServer
+@implements IAsyncDisposable
+@inject IBeaconApiClient Api
+
+<PageTitle>Beacon · Application</PageTitle>
+
+<p><a href="/">← Back to board</a></p>
+
+@if (_notFound)
+{
+    <p>This application doesn't exist.</p>
+}
+else if (_application is null)
+{
+    <p>Loading…</p>
+}
+else
+{
+    <h1>@_application.Company: @_application.Role</h1>
+    <p>Status: <strong>@_application.Status</strong></p>
+
+    @if (_application.JobUrl is not null)
+    {
+        <p><a href="@_application.JobUrl" target="_blank" rel="noopener noreferrer">Job posting ↗</a></p>
+    }
+
+    <h2>Documents</h2>
+
+    <div class="upload">
+        <select @bind="_kind" disabled="@_uploading">
+            <option value="Resume">Resume</option>
+            <option value="JobDescription">Job description</option>
+            <option value="Other">Other</option>
+        </select>
+        <InputFile OnChange="UploadAsync" accept=".txt,.md" disabled="@_uploading" />
+        @if (_uploading) { <span>Uploading…</span> }
+    </div>
+
+    @if (_uploadError is not null)
+    {
+        <p class="error">@_uploadError</p>
+    }
+
+    @if (_documents.Count == 0)
+    {
+        <p>No documents yet. Upload a resume or the job description.</p>
+    }
+    else
+    {
+        <table class="documents">
+            <thead><tr><th>File</th><th>Kind</th><th>Status</th><th>Chunks</th></tr></thead>
+            <tbody>
+                @foreach (var doc in _documents)
+                {
+                    <tr>
+                        <td>@doc.FileName</td>
+                        <td>@doc.Kind</td>
+                        <td>
+                            <span class="badge @doc.Status.ToLowerInvariant()">@doc.Status</span>
+                            @if (doc.Error is not null) { <div class="error">@doc.Error</div> }
+                        </td>
+                        <td>@doc.ChunkCount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private const long MaxUploadBytes = 3 * 1024 * 1024;
+
+    private ApplicationResponse? _application;
+    private bool _notFound;
+    private List<DocumentResponse> _documents = [];
+    private string _kind = "Resume";
+    private bool _uploading;
+    private string? _uploadError;
+
+    private readonly CancellationTokenSource _cts = new();
+    private bool _polling;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _application = await Api.GetApplicationAsync(Id, _cts.Token);
+        if (_application is null)
+        {
+            _notFound = true;
+            return;
+        }
+
+        await LoadDocumentsAsync();
+        StartPollingIfNeeded();
+    }
+
+    private async Task LoadDocumentsAsync() =>
+        _documents = (await Api.GetDocumentsAsync(Id, _cts.Token)).ToList();
+
+    private async Task UploadAsync(InputFileChangeEventArgs e)
+    {
+        _uploading = true;
+        _uploadError = null;
+        try
+        {
+            await using var stream = e.File.OpenReadStream(MaxUploadBytes, _cts.Token);
+            var result = await Api.UploadDocumentAsync(stream, e.File.Name, _kind, Id, _cts.Token);
+
+            if (result.Error is not null) _uploadError = result.Error;
+            else
+            {
+                _documents.Insert(0, result.Document!);
+                StartPollingIfNeeded();
+            }
+        }
+        catch (IOException)
+        {
+            _uploadError = "That file is too large to upload.";
+        }
+        finally
+        {
+            _uploading = false;
+        }
+    }
+
+    private static bool IsInProgress(DocumentResponse d) => d.Status is "Pending" or "Processing";
+
+    private void StartPollingIfNeeded()
+    {
+        if (_polling || !_documents.Any(IsInProgress)) return;
+        _polling = true;
+        _ = PollAsync();
+    }
+
+    private async Task PollAsync()
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(_cts.Token))
+            {
+                await LoadDocumentsAsync();
+                StateHasChanged();
+
+                if (!_documents.Any(IsInProgress)) break;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+
+        }
+        finally
+        {
+            _polling = false;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _cts.CancelAsync();
+        _cts.Dispose();
+    }
+}

@@ -1,6 +1,6 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@inject BeaconApiClient Api
+@inject IBeaconApiClient Api
 
 <PageTitle>Beacon · Board</PageTitle>
 
@@ -27,7 +27,7 @@ else
                 @foreach (var application in cards)
                 {
                     <article class="card">
-                        <strong>@application.Company</strong>
+                        <strong><a href="/applications/@application.Id">@application.Company</a></strong>
                         <span>@application.Role</span>
                         @if (application.AllowedTransitions.Count > 0)
                         {

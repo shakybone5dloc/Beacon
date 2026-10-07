@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient<BeaconApiClient>(http =>
+builder.Services.AddHttpClient<IBeaconApiClient, BeaconApiClient>(http =>
 {
     http.BaseAddress = new Uri(builder.Configuration["BeaconApi:BaseUrl"]
         ?? throw new InvalidOperationException("BeaconApi:BaseUrl is not configured."));

@@ -1,0 +1,24 @@
+.ask { display: flex; flex-direction: column; gap: 0.5rem; max-width: 48rem; }
+.ask textarea { font: inherit; padding: 0.6rem; }
+.buttons { display: flex; gap: 0.5rem; }
+
+.answer {
+    white-space: pre-wrap;
+    max-width: 48rem;
+    background: #f7f8fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    line-height: 105;
+}
+
+.cite { font-size: 0.8em; vertical-align: super; text-decoration: none; }
+.cursor { animation: blink 1 step-end steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.sources { max-width: 48rem; }
+.sources p { color: #444; font-size: 0.9rem; white-space: pre-wrap; }
+.score { color: #888; font-size: 0.8rem; }
+
+.error { color: #b3261e; }
+.hint { color: #666; font-style: italic; }

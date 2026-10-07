@@ -1,43 +1,44 @@
 ﻿@page "/applications/new"
-@inject BeaconApiClient Api
+@inject IBeaconApiClient Api
 @inject NavigationManager Nav
 
 <PageTitle>Beacon · New application</PageTitle>
+<div class="new-application">
+    <h1>New application</h1>
 
-<h1>New application</h1>
+    <EditForm EditContext="_editContext" FormName="new-application" OnSubmit="SubmitAsync" Enhance>
+        <ValidationSummary />
 
-<EditForm EditContext="_editContext" FormName="new-application" OnSubmit="SubmitAsync" Enhance class="form">
-    <ValidationSummary />
+        <label>
+            Company
+            <InputText @bind-Value="Form.Company" />
+        </label>
+        <ValidationMessage For="() => Form.Company" />
 
-    <label>
-        Company
-        <InputText @bind-Value="Form.Company" />
-    </label>
-    <ValidationMessage For="() => Form.Company" />
+        <label>
+            Role
+            <InputText @bind-Value="Form.Role" />
+        </label>
+        <ValidationMessage For="() => Form.Role" />
 
-    <label>
-        Role
-        <InputText @bind-Value="Form.Role" />
-    </label>
-    <ValidationMessage For="() => Form.Role" />
+        <label>
+            Job Posting Url
+            <InputText @bind-Value="Form.JobUrl" />
+        </label>
+        <ValidationMessage For="() => Form.JobUrl" />
 
-    <label>
-        Job Posting Url
-        <InputText @bind-Value="Form.JobUrl" />
-    </label>
-    <ValidationMessage For="() => Form.JobUrl" />
+        <label>
+            Notes
+            <InputTextArea @bind-Value="Form.Notes" />
+        </label>
+        <ValidationMessage For="() => Form.Notes" />
 
-    <label>
-        Notes
-        <InputTextArea @bind-Value="Form.Notes" />
-    </label>
-    <ValidationMessage For="() => Form.Notes" />
-
-    <div class="buttons">
-        <button type="submit">Create</button>
-        <a href="/">Cancel</a>
-    </div>
-</EditForm>
+        <div class="buttons">
+            <button type="submit">Create</button>
+            <a href="/">Cancel</a>
+        </div>
+    </EditForm>
+</div>
 
 @code {
     // Filled from the posted form data on submit; a fresh empty form on first load
