@@ -1,0 +1,15 @@
+# Build output: never send local builds into the image
+**/bin/
+**/obj/
+.vs/
+.git/
+.env
+TestResults/
+
+# TODO: add the IDE folder VS creates (you deleted it in Ticket 7)
+# TODO: add the git folder
+# TODO: add the secrets file compose reads
+# TODO: add the test output folder sitting at your repo root
+
+**/*.user
+tests/
