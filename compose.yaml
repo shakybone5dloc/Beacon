@@ -95,16 +95,6 @@ services:
         condition: service_healthy
     restart: "no"
 
-services:
-  ollama:
-    deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
-
 volumes:
   db-data:
   ollama-models:
