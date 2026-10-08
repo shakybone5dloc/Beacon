@@ -1,4 +1,6 @@
 x-db-connection: &db-connection "Host=db;Port=5432;Database=beacon;Username=postgres;Password=${POSTGRES_PASSWORD}"
+x-embedding-model: &embedding-model ${EMBEDDING_MODEL:-nomic-embed-text}
+x-chat-model: &chat-model ${CHAT_MODEL:-laama3.2}
 
 services:
   db:
@@ -29,6 +31,12 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   migrate:
     build:
@@ -50,6 +58,8 @@ services:
     environment:
       ConnectionStrings__Beacon: *db-connection
       Ai__Endpoint: "http://ollama:11434"
+      Ai__EmbeddingModel: *embedding-model
+      Ai__ChatModel: *chat-model
     depends_on:
       db:
         condition: service_healthy
@@ -69,6 +79,19 @@ services:
       - "8080:8080"
     depends_on:
       - api
+      
+  ollama-pull:
+    image: ollama/ollama
+    environment:
+      OLLAMA_HOST: "http://ollama:11434"
+      EMBEDDING_MODEL: *embedding-model
+      CHAT_MODEL: *chat-model
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["ollama pull \"$$EMBEDDING_MODEL\" && ollama pull \"$$CHAT_MODEL\""]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
 
 volumes:
   db-data:
