@@ -1,5 +1,6 @@
 using Beacon.Web.Components;
 using Beacon.Web.Services;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,14 @@ builder.Services.AddHttpClient<IBeaconApiClient, BeaconApiClient>(http =>
     http.BaseAddress = new Uri(builder.Configuration["BeaconApi:BaseUrl"]
         ?? throw new InvalidOperationException("BeaconApi:BaseUrl is not configured."));
 });
+
+var keysPath = builder.Configuration["DataProtection:KeysPath"];
+if (!string.IsNullOrEmpty(keysPath))
+{
+    builder.Services.AddDataProtection()
+        .SetApplicationName("Beacon.Web")
+        .PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+}
 
 var app = builder.Build();
 

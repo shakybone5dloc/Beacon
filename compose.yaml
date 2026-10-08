@@ -1,3 +1,5 @@
+x-db-connection: &db-connection "Host=db;Port=5432;Database=beacon;Username=postgres;Password=${POSTGRES_PASSWORD}"
+
 services:
   db:
     image: pgvector/pgvector:pg17
@@ -27,32 +29,48 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-  
+
+  migrate:
+    build:
+      context: .
+      dockerfile: src/Beacon.Api/Dockerfile
+      target: migrator
+    environment:
+      ConnectionStrings__Beacon: *db-connection
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
   api:
     build:
       context: .
       dockerfile: src/Beacon.Api/Dockerfile
+      target: runtime
     environment:
-      ConnectionStrings__Beacon: "Host=db;Port=5432;Database=beacon;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Beacon: *db-connection
       Ai__Endpoint: "http://ollama:11434"
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       ollama:
         condition: service_started
-      
+
   web:
     build:
       context: .
       dockerfile: src/Beacon.Web/Dockerfile
     environment:
       BeaconApi__BaseUrl: "http://api:8080/"
+      DataProtection__KeysPath: "/keys"
     ports:
       - "8080:8080"
     depends_on:
       - api
 
-
 volumes:
   db-data:
   ollama-models:
+  web-keys:
