@@ -1,6 +1,6 @@
 x-db-connection: &db-connection "Host=db;Port=5432;Database=beacon;Username=postgres;Password=${POSTGRES_PASSWORD}"
 x-embedding-model: &embedding-model ${EMBEDDING_MODEL:-nomic-embed-text}
-x-chat-model: &chat-model ${CHAT_MODEL:-laama3.2}
+x-chat-model: &chat-model ${CHAT_MODEL:-llama3.2}
 
 services:
   db:
@@ -75,6 +75,8 @@ services:
     environment:
       BeaconApi__BaseUrl: "http://api:8080/"
       DataProtection__KeysPath: "/keys"
+    volumes:
+      - web-keys:/keys
     ports:
       - "8080:8080"
     depends_on:
@@ -92,6 +94,16 @@ services:
       ollama:
         condition: service_healthy
     restart: "no"
+
+services:
+  ollama:
+    deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
 
 volumes:
   db-data:
