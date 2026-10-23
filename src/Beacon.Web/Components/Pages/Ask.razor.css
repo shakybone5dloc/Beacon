@@ -13,7 +13,7 @@
 }
 
 .cite { font-size: 0.8em; vertical-align: super; text-decoration: none; }
-.cursor { animation: blink 1 step-end steps(1) infinite; }
+.cursor { animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
 .sources { max-width: 48rem; }

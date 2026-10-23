@@ -16,8 +16,7 @@ public class BeaconApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public static readonly DateTimeOffset StartTime = new(2026, 11, 1, 12, 0, 0, TimeSpan.Zero);
 
-    private readonly PostgreSqlContainer _db = new PostgreSqlBuilder()
-        .WithImage("pgvector/pgvector:pg17")
+    private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("pgvector/pgvector:pg17")
         .Build();
 
     public FakeTimeProvider Clock { get; } = new(StartTime);

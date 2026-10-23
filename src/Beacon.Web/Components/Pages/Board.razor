@@ -71,7 +71,7 @@ else
             switch (result.Outcome)
             {
                 case MoveOutcome.Moved:
-                    var index = _applications.FindIndex(a => a.Id == application.Id);
+                    var index = _applications!.FindIndex(a => a.Id == application.Id);
                     _applications[index] = result.Application!;
                     break;
                 case MoveOutcome.Conflict:

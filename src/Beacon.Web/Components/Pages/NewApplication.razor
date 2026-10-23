@@ -11,27 +11,27 @@
 
         <label>
             Company
-            <InputText @bind-Value="Form.Company" />
+            <InputText @bind-Value="Form!.Company" />
         </label>
-        <ValidationMessage For="() => Form.Company" />
+        <ValidationMessage For="() => Form!.Company" />
 
         <label>
             Role
-            <InputText @bind-Value="Form.Role" />
+            <InputText @bind-Value="Form!.Role" />
         </label>
-        <ValidationMessage For="() => Form.Role" />
+        <ValidationMessage For="() => Form!.Role" />
 
         <label>
             Job Posting Url
-            <InputText @bind-Value="Form.JobUrl" />
+            <InputText @bind-Value="Form!.JobUrl" />
         </label>
-        <ValidationMessage For="() => Form.JobUrl" />
+        <ValidationMessage For="() => Form!.JobUrl" />
 
         <label>
             Notes
-            <InputTextArea @bind-Value="Form.Notes" />
+            <InputTextArea @bind-Value="Form!.Notes" />
         </label>
-        <ValidationMessage For="() => Form.Notes" />
+        <ValidationMessage For="() => Form!.Notes" />
 
         <div class="buttons">
             <button type="submit">Create</button>
@@ -43,13 +43,14 @@
 @code {
     // Filled from the posted form data on submit; a fresh empty form on first load
     [SupplyParameterFromForm]
-    private NewApplicationForm Form { get; set; } = new();
+    private NewApplicationForm? Form { get; set; }
 
     private EditContext _editContext = null!;
     private ValidationMessageStore _messages = null!;
 
     protected override void OnInitialized()
     {
+        Form ??= new();
         _editContext = new EditContext(Form);
         _messages = new ValidationMessageStore(_editContext);
     }
@@ -60,7 +61,7 @@
 
         var result = await Api.CreateApplicationAsync(new CreateApplicationRequest
         {
-            Company = Form.Company ?? "",
+            Company = Form!.Company ?? "",
             Role = Form.Role ?? "",
             JobUrl = string.IsNullOrWhiteSpace(Form.JobUrl) ? null : Form.JobUrl,
             Notes = string.IsNullOrWhiteSpace(Form.Notes) ? null : Form.Notes

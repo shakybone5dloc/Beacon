@@ -32,7 +32,7 @@
             }
             else
             {
-                <abbr class="cite" href="#source-@source">@text</abbr>
+                <a class="cite" href="#source-@source">@text</a>
             }
         }
         @if (_asking)
@@ -40,6 +40,11 @@
             <span class="cursor">▍</span>                 
         }
     </div>
+}
+
+@if (_error is not null)
+{
+    <p class="error">@_error</p>
 }
 
 @if (_grounded == false && _error is null)
@@ -50,7 +55,7 @@
 @if (_sources.Count > 0)
 {
     <h2>Sources</h2>
-    <ol class="srouces">
+    <ol class="sources">
         @foreach (var s in _sources)
         {
             <li id="source-@s.Number">

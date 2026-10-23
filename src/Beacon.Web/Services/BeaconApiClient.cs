@@ -69,7 +69,7 @@ public sealed class BeaconApiClient(HttpClient http) : IBeaconApiClient
     public async Task<IReadOnlyList<DocumentResponse>> GetDocumentsAsync(Guid applicationId, CancellationToken ct = default)
     {
         var response = await http.GetAsync($"api/applications/{applicationId}/documents", ct);
-        if (response.StatusCode == HttpStatusCode.NotFound) return null;
+        if (response.StatusCode == HttpStatusCode.NotFound) return [];
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<List<DocumentResponse>>(ct) ?? [];
     }

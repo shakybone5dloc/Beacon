@@ -31,7 +31,7 @@ internal static class HttpClientTestExtensions
     {
         var response = await client.UploadDocumentAsync(fileName, text, kind, applicationId, ct);
         Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
-        var accepted = (await response.Content.ReadFromJsonAsync<DocumentResponse>(ct));
+        var accepted = (await response.Content.ReadFromJsonAsync<DocumentResponse>(ct))!;
         return await client.WaitUntilFinishedAsync(accepted.Id, ct);
     }
 

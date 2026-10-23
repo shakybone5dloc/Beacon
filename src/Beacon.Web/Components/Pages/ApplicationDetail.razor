@@ -42,6 +42,11 @@ else
         <p class="error">@_uploadError</p>
     }
 
+    @if (_refreshError)
+    {
+        <p class="error">Couldn't refresh document status. Retrying…</p>
+    }
+
     @if (_documents.Count == 0)
     {
         <p>No documents yet. Upload a resume or the job description.</p>
@@ -82,6 +87,7 @@ else
 
     private readonly CancellationTokenSource _cts = new();
     private bool _polling;
+    private bool _refreshError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -141,7 +147,16 @@ else
         {
             while (await timer.WaitForNextTickAsync(_cts.Token))
             {
-                await LoadDocumentsAsync();
+                try
+                {
+                    await LoadDocumentsAsync();
+                    _refreshError = false;
+                }
+                catch (HttpRequestException)
+                {
+                    // Keep polling; the API may just be restarting
+                    _refreshError = true;
+                }
                 StateHasChanged();
 
                 if (!_documents.Any(IsInProgress)) break;
