@@ -6,7 +6,10 @@
   <Folder Name="/Solution Items/">
     <File Path=".dockerignore" />
     <File Path=".env" />
+    <File Path=".env.example" />
+    <File Path="compose.gpu.yaml" />
     <File Path="compose.yaml" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Beacon.Api/Beacon.Api.csproj" />
